@@ -9,9 +9,9 @@
   #?(:cljs (throw (js/Error. message))
      :clj  (throw (IllegalArgumentException. message))))
 
-(defn- array-list?
+(defn- java-coll?
   [coll]
-  (instance? java.util.ArrayList coll))
+  (instance? java.util.Collection coll))
 
 (defn- namespacefy-keyword [keyword-to-be-modified {:keys [ns] :as options}]
   (when-not (keyword? keyword-to-be-modified)
@@ -67,13 +67,13 @@
     (map? item)
     (namespacefy-map item options)
 
-    (or (vector? item) (array-list? item))
+    (vector? item)
     (mapv #(namespacefy-coll-item % options) item)
 
     (set? item)
     (set (map #(namespacefy-coll-item % options) item))
 
-    (coll? item)
+    (or (coll? item) (java-coll? item))
     (map #(namespacefy-coll-item % options) item)
 
     :default
@@ -87,13 +87,13 @@
     (map? data)
     (namespacefy-map data options)
 
-    (or (vector? data) (array-list? data))
+    (vector? data)
     (mapv #(namespacefy-coll-item % options) data)
 
     (set? data)
     (set (map #(namespacefy-coll-item % options) data))
 
-    (coll? data)
+    (or (coll? data) (java-coll? data))
     (map #(namespacefy-coll-item % options) data)
 
     (nil? data)
@@ -133,13 +133,13 @@
     (map? item)
     (unnamespacefy-map item options)
 
-    (or (vector? item) (array-list? item))
+    (vector? item)
     (mapv #(unnamespacefy-coll-item % options) item)
 
     (set? item)
     (set (map #(unnamespacefy-coll-item % options) item))
 
-    (coll? item)
+    (or (coll? item) (java-coll? item))
     (map #(unnamespacefy-coll-item % options) item)
 
     :default
@@ -155,13 +155,13 @@
      (map? data)
      (unnamespacefy-map data options)
 
-     (or (vector? data) (array-list? data))
+     (vector? data)
      (mapv #(unnamespacefy-coll-item % options) data)
 
      (set? data)
      (set (map #(unnamespacefy-coll-item % options) data))
 
-     (coll? data)
+     (or (coll? data) (java-coll? data))
      (map #(unnamespacefy-coll-item % options) data)
 
      (nil? data)
